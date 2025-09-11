@@ -18,7 +18,7 @@ export default async function SetupLayout ({
         where: {
             userId 
         }
-    })
+    });
 
     if(store){
       redirect(`/${store.id}`)  
