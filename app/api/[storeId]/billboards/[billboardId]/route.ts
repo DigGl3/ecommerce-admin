@@ -61,7 +61,7 @@ export async function PATCH (
         }
 
 
-        const billboard = await prismadb.billboard.update({
+        const billboard = await prismadb.billboard.updateMany({
             where : {
                 id: params.billboardId,
             }, 
@@ -106,7 +106,7 @@ export async function DELETE (
         }
 
 
-        const billboard = await prismadb.billboard.delete({
+        const billboard = await prismadb.billboard.deleteMany({
             where : {
                 id: params.billboardId,
             }
