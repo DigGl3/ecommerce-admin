@@ -1,5 +1,4 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
-import { createRouteMatcher } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
@@ -7,9 +6,9 @@ const isPublicRoute = createRouteMatcher([
   '/api/(.*)',
 ]);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
-    //auth.protect(); // fără await
+    await auth.protect(); // folosește cheia secretă server-side
   }
 });
 
