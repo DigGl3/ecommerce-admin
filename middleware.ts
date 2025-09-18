@@ -1,31 +1,39 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 /**
- * Define rutele publice care NU trebuie protejate
- * - pagina de login / signup
- * - API-uri publice (ex: webhook Stripe)
+ * Definește rutele publice care nu necesită autentificare:
+ * - login / signup
+ * - webhook-uri sau alte API-uri publice
  */
-const isPublicRoute = createRouteMatcher([
+const publicRoutes = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhook(.*)',
-  '/api/public(.*)', // eventuale alte API-uri publice
+  '/api/public(.*)',
 ]);
 
 /**
- * Middleware-ul principal
- * Protejează toate rutele care NU sunt publice
+ * Middleware principal
+ * Protejează toate rutele care nu sunt publice
  */
 export default clerkMiddleware(async (auth, req) => {
-  console.log('Middleware called for:', req.url);
+  // Log pentru debug
+  console.log(`[Clerk Middleware] Request URL: ${req.url}`);
 
-  if (!isPublicRoute(req)) {
+  if (!publicRoutes(req)) {
     try {
-      await auth.protect(); // folosește CLERK_SECRET_KEY server-side
-    } catch (err) {
-      console.error('Auth protect failed:', err);
-      throw err; // aruncă eroarea ca să vezi exact ce merge prost
+      await auth.protect(); // protecție server-side
+      console.log('[Clerk Middleware] Access granted');
+    } catch (error) {
+      console.warn('[Clerk Middleware] Access denied, redirecting to /sign-in');
+      // Redirecționează către pagina de login
+      return Response.redirect(
+        '/sign-in?redirect_url=' + encodeURIComponent(req.url),
+        302
+      );
     }
+  } else {
+    console.log('[Clerk Middleware] Public route, no auth needed');
   }
 });
 
@@ -34,6 +42,6 @@ export default clerkMiddleware(async (auth, req) => {
  */
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)', // exclude resurse statice Next.js
+    '/((?!_next/static|_next/image|favicon.ico).*)', // exclude resurse statice
   ],
 };
