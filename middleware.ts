@@ -1,13 +1,9 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { authMiddleware } from '@clerk/nextjs';
 
-export default clerkMiddleware((auth, req) => {
-  if (req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/api")) {
-    auth.protect();
-  }
+export default authMiddleware({
+  publicRoutes: ["/api/:path*"],
 });
 
 export const config = {
-  matcher: [
-    "/((?!_next|.*\\..*|sign-in|sign-up).*)",
-  ],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
